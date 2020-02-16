@@ -38,8 +38,8 @@ impl Config {
         s.set("chip_description_path", opt.chip_description_path)?;
         if let Some(pi) = opt.probe_index { s.set("probe_index",pi)?; }
         if let Some(ci) = opt.core_index { s.set("core_index", ci)?; }
-        s.set("enable_println", opt.enable_println)?;
-        s.set("enable_websockets", opt.enable_websockets)?;
+        if opt.enable_println { s.set("enable_println", true)?; }
+        if opt.enable_websockets { s.set("enable_websockets", true)?; }
         if let Some(wu) = opt.websocket_url { s.set("websocket_url", wu)?; }
         s.set("stimuli", opt.stimuli.into_iter().map(|s| s.into()).collect::<Vec<Value>>())?;
 

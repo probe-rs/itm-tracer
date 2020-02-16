@@ -816,7 +816,7 @@ dependencies = [
 [[package]]
 name = "probe-rs"
 version = "0.5.0"
-source = "git+https://github.com/probe-rs/probe-rs?branch=itm#b36b9d3e8695f74f9785c02afbd1c4d8f0b8c3ac"
+source = "git+https://github.com/probe-rs/probe-rs?branch=itm#bd0f9edcb64a7a5d8e8beb24ad1a0677a365bfb2"
 dependencies = [
  "bitfield",
  "capstone",
@@ -843,7 +843,7 @@ dependencies = [
 [[package]]
 name = "probe-rs-t2rust"
 version = "0.5.0"
-source = "git+https://github.com/probe-rs/probe-rs?branch=itm#b36b9d3e8695f74f9785c02afbd1c4d8f0b8c3ac"
+source = "git+https://github.com/probe-rs/probe-rs?branch=itm#bd0f9edcb64a7a5d8e8beb24ad1a0677a365bfb2"
 dependencies = [
  "base64",
  "proc-macro2 1.0.8",

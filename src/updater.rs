@@ -41,6 +41,7 @@ where
     O: Serialize + Send + Sync + Debug + 'static
 {
     /// Creates a new `UpdaterChannel` where crossover is done internally.
+    /// 
     /// The argument naming is done from the `Updater`s view. Where as the member naming is done from a user point of view.
     pub fn new(rx: Sender<O>, tx: Receiver<I>) -> Self {
         Self {

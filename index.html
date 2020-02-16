@@ -1,0 +1,248 @@
+<script src="https://unpkg.com/mithril/mithril.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.15.6/apexcharts.min.js" integrity="sha256-FWOJK/d5ZSH3m/D8a9ORNLiauy2SOwxflaHuVCgY3Sg=" crossorigin="anonymous"></script>
+
+<html>
+    <head>
+        <title>Raichu</title>
+    </head>
+
+    <style>
+        /* .container-fluid > .row {
+            margin-top: 0.5em;
+        } */
+
+        .card-title {
+            margin-bottom: 0;
+        }
+
+        .card-text {
+            margin-top: 1em;
+        }
+
+        h2 {
+            margin: 0;
+        }
+    </style>
+
+    <body>
+    </body>
+</html>
+
+<script type="text/javascript">
+    var root = document.body
+
+    function card({ title, content, title_content, flavor, bg, loading }) {
+        flavor = flavor ? flavor : 'success';
+        bg = bg ? bg : 'white';
+        return m('.col',
+            m('.card.mb-2.border-' + flavor + '.shadow[style=overflow:hidden;background-color:' + bg + ']',
+                m('.row.no-gutters', [
+                    m('.col',
+                        m('.card-body', [
+                            m('h6.card-title.d-flex.justify-content-between.text-' + flavor, [
+                                title ? title : '',
+                                (title_content && !loading) ? title_content : '',
+                                loading ? m('.spinner-grow.text-primary[role=status]', m('span.sr-only', 'Loading ...')) : '',
+                            ]),
+                            !loading ? m('p.card-text', content) : '',
+                        ])
+                    )
+                ])
+            )
+        );
+    }
+
+    function componentToHex(c) {
+        var hex = c.toString(16);
+        return hex.length == 1 ? '0' + hex : hex;
+    }
+
+    function rgbToHex(r, g, b) {
+        return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
+    }
+
+    function send(vnode) {
+        vnode.state.socket.send(JSON.stringify(vnode.state.statemachine_parameters))
+    }
+
+    function display_maybe(value, suffix) {
+        suffix = suffix ? suffix : '';
+        if (value == undefined) {
+            return '?';
+        } else {
+            return value + suffix;
+        }
+    }
+
+    function byteArrayToInt(byteArray) {
+        var value = 0;
+        for ( var i = byteArray.length - 1; i >= 0; i--) {
+            value = (value * 256) + byteArray[i];
+        }
+
+        return value;
+    };
+
+    var Tracer = {
+        oninit: function(vnode) {
+            // Open an initial socket.
+            this.onclose(vnode);
+
+            // We init arrays for data from the four possible DWT sub-units.
+            vnode.state.dwt_traces = [[], [], [], []];
+            vnode.state.new_data_received = false;
+            vnode.state.log = [];
+            for(let i = 0; i < 32; i++) {
+                vnode.state.log.push("")
+            }
+        },
+        onmessage: function(vnode, event) {
+            let data = JSON.parse(event.data);
+            if(data.Packet && data.Packet.DwtData) {
+                if(data.Packet.DwtData.id == 17) {
+                    let value = byteArrayToInt(data.Packet.DwtData.payload);
+                    vnode.state.dwt_traces[0].push(value);
+                    m.redraw();
+                } else {
+                    console.log(data.Packet.DwtData.id);
+                }
+                console.log(data.Packet.DwtData)
+            }
+            if(data.Packet && data.Packet.ItmData) {
+                let incomming = "";
+                for(let i = 0; i < data.Packet.ItmData.payload.length; i++) {
+                    let byte = data.Packet.ItmData.payload[i];
+                    incomming += String.fromCharCode(byte);
+                }
+                vnode.state.log[data.Packet.ItmData.id] += incomming.replace("\n", "<br>");
+                m.redraw();
+            }
+        },
+        onclose: function(vnode, event) {
+            let me = this;
+
+            // Set the loading state to true.
+            vnode.state.loading = true;
+
+            // Open the websocket.
+            vnode.state.socket = new WebSocket('ws://127.0.0.1:1337');
+
+            // When the socket is open, leave loading state.
+            vnode.state.socket.onopen = event => me.onopen(vnode, event);
+
+            // When we get a message, update all our content.
+            vnode.state.socket.onmessage = event => me.onmessage(vnode, event);
+
+            // When the socket is closed, try to reopen it. Meanwhile don't render our panels.
+            vnode.state.socket.onclose = event => me.onclose(vnode, event);
+
+            m.redraw();
+        },
+        onopen: function(vnode, event) {
+            // We are not loading anymore.
+            vnode.state.loading = false;
+
+            m.redraw();
+        },
+        view: function (vnode) {
+            return m('.row.row-cols-2', [
+                card({
+                    title: 'Memory plotting',
+                    content: m(Chart, {
+                        data: vnode.state.dwt_traces,
+                        new_data_received: vnode.state.new_data_received,
+                    }),
+                    loading: vnode.state.loading,
+                }),
+                card({
+                    title: 'ITM stimulus 0',
+                    content: m(Log, {
+                        log: vnode.state.log,
+                        stimulus: 0,
+                    }),
+                    loading: vnode.state.loading,
+                }),
+                card({
+                    title: 'ITM stimulus 1',
+                    content: m(Log, {
+                        log: vnode.state.log,
+                        stimulus: 1,
+                    }),
+                    loading: vnode.state.loading,
+                })
+            ])
+        }
+    };
+
+    var Chart = {
+        oncreate(vnode) {
+            var options = {
+                series: [{
+                    name: "0x2000_3000",
+                    data: vnode.attrs.data[0],
+                },{
+                    name: "Not tracing",
+                    data: vnode.attrs.data[1],
+                },{
+                    name: "Not tracing",
+                    data: vnode.attrs.data[2],
+                },{
+                    name: "Not tracing",
+                    data: vnode.attrs.data[3],
+                }],
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    zoom: {
+                        enabled: false
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'straight'
+                },
+                title: {
+                    text: 'Memory values',
+                    align: 'middle'
+                },
+                grid: {
+                    row: {
+                        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                        opacity: 0.5
+                    },
+                },
+            };
+
+            vnode.state.chart = new ApexCharts(vnode.dom, options);
+            vnode.state.chart.render();
+        },
+        onupdate(vnode) {
+            vnode.state.chart.updateSeries(vnode.attrs.data.map(data => ({
+                data
+            })))
+        },
+        view() {
+            return m('')
+        }
+    }
+
+    var Log = {
+        view(vnode) {
+            return m('', m.trust(vnode.attrs.log[vnode.attrs.stimulus]))
+        }
+    }
+
+    var Panel = {
+        view: function(vnode) {
+            return m('.container-fluid', [
+                m(Tracer),
+                ,
+            ])
+        }
+    }
+
+    m.mount(root, Panel);
+</script>
