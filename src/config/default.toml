@@ -3,4 +3,5 @@ core_index = 0
 enable_println = true
 enable_websockets = true
 websocket_url = "127.0.0.1:1337"
+webserver_url = "127.0.0.1:3030"
 stimuli = []

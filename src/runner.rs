@@ -1,11 +1,11 @@
 use scroll::Pread;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use probe_rs::itm::{TracePacket, Decoder};
+use probe_rs::itm::{Decoder, TracePacket};
 use probe_rs::Session;
 
 use crate::config::CONFIG;
-use crate::updater::{WebsocketUpdater, Updater, UpdaterChannel};
+use crate::updater::{Updater, UpdaterChannel, WebsocketUpdater};
 
 #[derive(Debug, Serialize)]
 enum Update {
@@ -18,7 +18,6 @@ enum Command {
 }
 
 pub fn runner(session: &mut Session) -> ! {
-
     let mut decoder = Decoder::new();
 
     let mut console = if CONFIG.enable_println {
@@ -40,12 +39,12 @@ pub fn runner(session: &mut Session) -> ! {
             match updater.rx().try_recv() {
                 Ok(command) => {
                     log::info!("Got backend command message: {:?}", command);
-                    
+
                     match command {
-                        _ => ()
+                        _ => (),
                     };
-                },
-                _ => ()
+                }
+                _ => (),
             }
         }
 
@@ -82,7 +81,7 @@ pub fn runner(session: &mut Session) -> ! {
                         // Then collect all the lines we have gotten so far.
                         let data = stimuli[id].clone();
                         let mut lines: Vec<_> = data.lines().collect();
-                        
+
                         // If there is at least one char in the total of all received chars, look at the last one.
                         let last_char = stimuli[id].chars().last();
                         if let Some(last_char) = last_char {

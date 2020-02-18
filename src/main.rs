@@ -1,6 +1,7 @@
-mod updater;
 mod config;
 mod runner;
+mod server;
+mod updater;
 
 use std::path::Path;
 
@@ -12,7 +13,8 @@ use probe_rs::Probe;
 
 use crate::config::CONFIG;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     pretty_env_logger::init();
     match main_try() {
         Ok(_) => (),
@@ -29,16 +31,24 @@ fn main_try() -> Result<(), failure::Error> {
         probe_rs::config::registry::add_target_from_yaml(&Path::new(cdp))?;
     }
 
-    let chip = CONFIG.chip
+    let chip = CONFIG
+        .chip
         .as_ref()
         .map(|chip| chip.into())
         .unwrap_or(TargetSelector::Auto);
+
+    if CONFIG.enable_websockets {
+        server::start();
+    }
 
     // Get a list of all available debug probes.
     let probes = Probe::list_all();
 
     let device = probes.get(CONFIG.probe_index).ok_or_else(|| {
-        format_err!("Unable to open probe with index {}: Probe not found.", CONFIG.probe_index)
+        format_err!(
+            "Unable to open probe with index {}: Probe not found.",
+            CONFIG.probe_index
+        )
     })?;
 
     // Use the first probe found.
@@ -58,5 +68,5 @@ fn main_try() -> Result<(), failure::Error> {
 
     println!("Starting ITM trace ...");
 
-   runner::runner(&mut session);
+    runner::runner(&mut session);
 }
