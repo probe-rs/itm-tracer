@@ -1,0 +1,89 @@
+.layout {
+    flex-direction: row;
+    height: 100%;
+    display: flex;
+}
+
+.canvas {
+    order: 1;
+    flex: 1;
+    height: 100vh;
+}
+
+.sidebar {
+    background: #f5f6fa;
+    flex-grow: 0;
+    order: 2;
+    height: 100vh;
+    width: 420px;
+    position: relative;
+    transition: width 0.75s;
+}
+
+.sidebar-hidden {
+    width: 0px;
+}
+
+.sidebar-visible {
+    width: 420px;
+}
+
+.sidebar-content {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.sidebar-content {
+    padding-top: 100px;
+    padding-bottom: 25px;
+}
+
+.sidebar-content .card {
+    margin-top: 1em;
+    padding: 1em;
+}
+
+.sidebar > .close-button {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    left: -25px;
+    top: 25px;
+    transition: left 0.75s;
+}
+
+.sidebar-hidden > .close-button {
+    position: absolute;
+    left: -75px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
+}
+
+.App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+
+.App-link {
+    color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
