@@ -1,37 +1,61 @@
 import { SinkProperties } from './Sink';
 import App from '../App';
+import { Connector } from '../connector';
 
 class State {
-    state: App
+    app: App
 
-    constructor(state: App) {
-        this.state = state;
+    constructor(app: App) {
+        this.app = app;
     }
 
     eval(script: string) {
         let func = new Function('sinks', '{' + script + '}');
         let sinks: SinkProperties[] = [];
 
-        (sinks as any).add = function(x: string, y: string, w: string, h: string) {
+        let me = this;
+
+        const defaultArgs = {
+            x: 0,
+            y: 0,
+            w: 300,
+            h: 300,
+            type: 'line',
+            sources: [],
+        };
+
+        (sinks as any).add = function (args: {
+            x: string,
+            y: string,
+            w: string,
+            h: string,
+            type: string,
+            sources: string[],
+        }) {
+            let assembledArgs = { ...defaultArgs, ...args };
+            console.log(assembledArgs)
             this.push({
                 size: {
-                    x: w,
-                    y: h,
+                    x: assembledArgs.w,
+                    y: assembledArgs.h,
                 },
                 position: {
-                    x,
-                    y,
-                }
+                    x: assembledArgs.x,
+                    y: assembledArgs.y,
+                },
+                connector: me.app.state.connector,
+                type: assembledArgs.type,
+                sources: assembledArgs.sources,
             });
             console.log(sinks)
         }
 
         try {
             func(sinks);
-        } catch(e) {
+        } catch (e) {
             console.error(e);
         }
-        this.state.setState({ sinks });
+        this.app.setState({ sinks });
     }
 }
 

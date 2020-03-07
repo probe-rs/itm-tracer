@@ -1,4 +1,6 @@
 .canvas {
     position: relative;
+    order: 1;
     flex-grow: 1;
+    height: 100vh;
 }

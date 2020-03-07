@@ -4,12 +4,6 @@
     display: flex;
 }
 
-.canvas {
-    order: 1;
-    flex: 1;
-    height: 100vh;
-}
-
 .sidebar {
     background: #f5f6fa;
     flex-grow: 0;

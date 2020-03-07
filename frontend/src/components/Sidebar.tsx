@@ -3,6 +3,9 @@ import { Card, Container, Button, Form } from 'react-bootstrap';
 import { Connector, Update, DwtMode } from '../connector';
 import { SinkProperties } from './Sink';
 import State from './State'
+import { byteArrayToInt } from '../Domain';
+
+import './Sidebar.css';
 
 let SINKS: SinkProperties[] = [];
 
@@ -33,7 +36,35 @@ class Sidebar extends React.Component<Properties, SidebarState> {
             dwt: {
                 units: [],
             },
-            script: '',
+            script: `\
+sinks.add({
+    x: '0%',
+    y: '0%',
+    w: '70%',
+    h: '70%'
+})
+sinks.add({
+    x: '0%',
+    y: '50%',
+    w: '70%',
+    h: '50%'
+})
+sinks.add({
+    x: '70%',
+    y: '0%',
+    w: '30%',
+    h: '50%',
+    type: 'text',
+    sources: ['itm-0'],
+})
+sinks.add({
+    x: '70%',
+    y: '50%',
+    w: '30%',
+    h: '50%',
+    type: 'text',
+    sources: ['itm-1'],
+})`,
         };
 
         SINKS = props.sinks;
@@ -47,7 +78,7 @@ class Sidebar extends React.Component<Properties, SidebarState> {
     }
 
     messageHandler(update: Update) {
-        if(update.Information) {
+        if (update.Information) {
             const info = update.Information;
             this.setState(state => ({
                 dwt: {
@@ -56,10 +87,10 @@ class Sidebar extends React.Component<Properties, SidebarState> {
             }))
         }
 
-        if(update.Packet && update.Packet.DwtData) {
+        if (update.Packet && update.Packet.DwtData) {
             const data = update.Packet.DwtData;
 
-            if(data.id == 17) {
+            if (data.id == 17) {
                 let value = byteArrayToInt(data.payload);
                 this.state.dwt.units[0].data.push(value);
             }
@@ -94,27 +125,25 @@ class Sidebar extends React.Component<Properties, SidebarState> {
         }))
     }
 
-    eval(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        console.log('EVAL');
-        console.log(this.state.script);
+    eval(_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         this.props.state.eval(this.state.script);
     }
 
     render() {
         return (
-            <Container>
-                {this.state.dwt.units.map((unit, id) => {
+            <Container className="d-flex flex-grow-1 flex-column h-100">
+                {this.state.dwt.units.map((unit, i) => {
                     return (
-                        <div></div>
+                        <div key={i}></div>
                     )
                 })}
-                <Card>
-                    <Form.Group controlId="">
+                <Card className="d-flex flex-grow-1 flex-column">
+                    <Form.Group className="d-flex flex-grow-1 flex-column">
                         <Form.Label>Config</Form.Label>
                         <Form.Control
                             as="textarea"
-                            rows="5"
-                            value={ this.state.script }
+                            className="code-area d-flex flex-grow-1 flex-column"
+                            value={this.state.script}
                             onChange={
                                 e => this.setState({
                                     script: (e.target as any).value
@@ -122,20 +151,11 @@ class Sidebar extends React.Component<Properties, SidebarState> {
                             }
                         />
                     </Form.Group>
-                    <Button onClick={ this.eval }>Load</Button>
+                    <Button onClick={this.eval}>Load</Button>
                 </Card>
             </Container>
         )
     }
 }
-
-function byteArrayToInt(byteArray: number[]) {
-    var value = 0;
-    for ( var i = byteArray.length - 1; i >= 0; i--) {
-        value = (value * 256) + byteArray[i];
-    }
-
-    return value;
-};
 
 export default Sidebar;

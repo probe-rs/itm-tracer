@@ -21,20 +21,14 @@ class App extends React.Component<{}, AppState> {
 
     constructor(props: any) {
         super(props);
+
+        let connector = new Connector();
+
         this.state = {
             sidebarVisible: true,
             cards: [],
-            connector: new Connector(),
-            sinks: [{
-                size: {
-                    x: 400,
-                    y: 500,
-                },
-                position: {
-                    x: 40,
-                    y: 50,
-                }
-            }],
+            connector,
+            sinks: [],
         };
         this.appState = new State(this);
         this.hideSidebar = this.hideSidebar.bind(this);
