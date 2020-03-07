@@ -29,7 +29,7 @@ class LineSink extends React.Component<LineSinkProperties, LineSinkState> {
         let wsUpdater = function (id: string, data: Update) {
             me.setState(state => {
                 let traces = state.traces;
-                traces[0].data.push({ x: new Date(), y: byteArrayToInt(data.Packet.DwtData.payload) })
+                traces.find(trace => trace.id === id)!.data.push({ x: new Date(), y: byteArrayToInt(data.Packet.DwtData.payload) })
                 return {
                     traces
                 }

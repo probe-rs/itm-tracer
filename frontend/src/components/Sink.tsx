@@ -36,9 +36,9 @@ interface SinkState {
 }
 
 class Sink extends React.Component<SinkProperties, SinkState> {
-    // constructor(props: SinkProperties) {
-    //     super(props)
-    // }
+    constructor(props: SinkProperties) {
+        super(props)
+    }
 
     render() {
         let style = {

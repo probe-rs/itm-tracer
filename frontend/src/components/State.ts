@@ -33,7 +33,6 @@ class State {
             sources: string[],
         }) {
             let assembledArgs = { ...defaultArgs, ...args };
-            console.log(assembledArgs)
             this.push({
                 size: {
                     x: assembledArgs.w,
@@ -47,7 +46,6 @@ class State {
                 type: assembledArgs.type,
                 sources: assembledArgs.sources,
             });
-            console.log(sinks)
         }
 
         try {
