@@ -1,6 +1,12 @@
 .sink {
-    position: absolute;
     padding: 1em;
+    height: 100%;
+    width: 100%;
+}
+
+.sink-wrapper {
+    position: absolute;
+    padding: 0.75em;
 }
 
 .text-sink {

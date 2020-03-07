@@ -1,21 +1,41 @@
-import { ResponsiveLine, Serie } from '@nivo/line'
+import { ResponsiveLineCanvas, Serie } from '@nivo/line'
 import React from 'react';
-import { Card } from 'react-bootstrap';
-import { Trace } from './Sink';
 import { timeFormat } from 'd3-time-format'
+import { Connector, Update } from '../connector';
+import { byteArrayToInt } from '../Domain';
 
 export interface LineSinkProperties {
-    traces: Trace[],
-    updateData: (data: any) => void,
+    sources: string[],
+    connector: Connector,
 }
 
 export interface LineSinkState {
-    data: Serie[]
+    traces: Serie[],
 }
 
 class LineSink extends React.Component<LineSinkProperties, LineSinkState> {
     constructor(props: LineSinkProperties) {
         super(props)
+
+        this.state = {
+            traces: props.sources.map(source => ({
+                id: source,
+                data: [],
+            })),
+        };
+
+
+        let me = this;
+        let wsUpdater = function (id: string, data: Update) {
+            me.setState(state => {
+                let traces = state.traces;
+                traces[0].data.push({ x: new Date(), y: byteArrayToInt(data.Packet.DwtData.payload) })
+                return {
+                    traces
+                }
+            });
+        }
+        props.sources.forEach(source => props.connector.registerMessageHandler(source, (id, update) => wsUpdater(id, update)));
     }
 
     formatTime(arg: any): string {
@@ -23,8 +43,8 @@ class LineSink extends React.Component<LineSinkProperties, LineSinkState> {
     }
 
     render() {
-        return (<ResponsiveLine
-            data={this.props.traces as Serie[]}
+        return (<ResponsiveLineCanvas
+            data={this.state.traces}
             margin={{ top: 30, right: 100, bottom: 60, left: 100 }}
             xScale={{ type: 'time', format: 'native' }}
             yScale={{ type: 'linear' }}
@@ -43,12 +63,8 @@ class LineSink extends React.Component<LineSinkProperties, LineSinkState> {
             enablePoints={false}
             enableGridX={true}
             curve="monotoneX"
-            animate={false}
-            motionStiffness={120}
-            motionDamping={50}
             isInteractive={false}
             enableSlices={false}
-            useMesh={true}
             theme={{
                 axis: { ticks: { text: { fontSize: 14 } } },
                 grid: { line: { stroke: '#ddd', strokeDasharray: '1 2' } },

@@ -7,8 +7,6 @@ import { byteArrayToInt } from '../Domain';
 
 import './Sidebar.css';
 
-let SINKS: SinkProperties[] = [];
-
 interface Properties {
     cards: any[],
     connector: Connector,
@@ -41,13 +39,15 @@ sinks.add({
     x: '0%',
     y: '0%',
     w: '70%',
-    h: '70%'
+    h: '50%',
+    sources: ['dwt-0'],
 })
 sinks.add({
     x: '0%',
     y: '50%',
     w: '70%',
-    h: '50%'
+    h: '50%',
+    sources: ['dwt-1'],
 })
 sinks.add({
     x: '70%',
@@ -67,35 +67,33 @@ sinks.add({
 })`,
         };
 
-        SINKS = props.sinks;
-
-        this.messageHandler = this.messageHandler.bind(this);
+        // this.messageHandler = this.messageHandler.bind(this);
         this.onConnectMock = this.onConnectMock.bind(this);
         this.eval = this.eval.bind(this);
 
-        props.connector.registerMessageHandler(this.messageHandler);
+        // props.connector.registerMessageHandler(this.messageHandler);
         props.connector.registerOpenHandlers(this.onConnectMock);
     }
 
-    messageHandler(update: Update) {
-        if (update.Information) {
-            const info = update.Information;
-            this.setState(state => ({
-                dwt: {
-                    units: info.dwt.units.map(({ mode, address, active }) => ({ mode, address, active, data: [], }))
-                },
-            }))
-        }
+    // messageHandler(update: Update) {
+    //     if (update.Information) {
+    //         const info = update.Information;
+    //         this.setState(state => ({
+    //             dwt: {
+    //                 units: info.dwt.units.map(({ mode, address, active }) => ({ mode, address, active, data: [], }))
+    //             },
+    //         }))
+    //     }
 
-        if (update.Packet && update.Packet.DwtData) {
-            const data = update.Packet.DwtData;
+    //     if (update.Packet && update.Packet.DwtData) {
+    //         const data = update.Packet.DwtData;
 
-            if (data.id == 17) {
-                let value = byteArrayToInt(data.payload);
-                this.state.dwt.units[0].data.push(value);
-            }
-        }
-    }
+    //         if (data.id === 17) {
+    //             let value = byteArrayToInt(data.payload);
+    //             this.state.dwt.units[0].data.push(value);
+    //         }
+    //     }
+    // }
 
     onConnectMock() {
         this.setState(_state => ({

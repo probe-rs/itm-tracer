@@ -1,5 +1,3 @@
-import { Dwt } from "./arm/components";
-
 export enum DwtMode {
     Memory = 'Memory',
 }
@@ -38,9 +36,11 @@ export enum Command {
 
 export class Connector {
     state: {
-        loading: boolean,
-        socket?: WebSocket,
-        messageHandlers: ((data: Update) => void)[]
+        loading: boolean
+        socket?: WebSocket
+        messageHandlers: {
+            [x: string]: ((id: string, data: Update) => void)[]
+        }
         closeHandlers: (() => void)[]
         openHandlers: (() => void)[]
     }
@@ -49,7 +49,7 @@ export class Connector {
         this.state = {
             loading: true,
             socket: undefined,
-            messageHandlers: [],
+            messageHandlers: {},
             closeHandlers: [],
             openHandlers: [],
         };
@@ -58,8 +58,11 @@ export class Connector {
         this.onclose();
     }
 
-    registerMessageHandler(handler: (data: Update) => void) {
-        this.state.messageHandlers.push(handler)
+    registerMessageHandler(source: string, handler: (id: string, data: Update) => void) {
+        if (!this.state.messageHandlers[source]) {
+            this.state.messageHandlers[source] = [];
+        }
+        this.state.messageHandlers[source].push(handler);
     }
 
     registerCloseHandlers(handler: () => void) {
@@ -72,10 +75,22 @@ export class Connector {
 
     onmessage(event: MessageEvent) {
         let data = JSON.parse(event.data) as Update;
-        
-        this.state.messageHandlers.forEach(handler => {
-            handler(data)
-        });
+
+        let id = '';
+
+        if (data.Packet) {
+            if (data.Packet && data.Packet.ItmData) {
+                id = 'itm-' + data.Packet.ItmData.id;
+            } else if (data.Packet.DwtData) {
+                id = 'dwt-' + (data.Packet.DwtData.id >> 4);
+            }
+
+            if (this.state.messageHandlers[id]) {
+                this.state.messageHandlers[id].forEach(handler => {
+                    handler(id, data)
+                });
+            }
+        }
 
         // if(data.Packet && data.Packet.DwtData) {
         //     if(data.Packet.DwtData.id == 17) {

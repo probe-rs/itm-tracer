@@ -1,6 +1,5 @@
 import { SinkProperties } from './Sink';
 import App from '../App';
-import { Connector } from '../connector';
 
 class State {
     app: App
@@ -10,6 +9,7 @@ class State {
     }
 
     eval(script: string) {
+        /*eslint no-new-func: "off"*/
         let func = new Function('sinks', '{' + script + '}');
         let sinks: SinkProperties[] = [];
 

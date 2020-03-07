@@ -11,9 +11,9 @@ interface State {
 }
 
 class Canvas extends React.Component<Properties, State> {
-    constructor(props: Properties) {
-        super(props)
-    }
+    // constructor(props: Properties) {
+    //     super(props)
+    // }
 
     render() {
         return (
