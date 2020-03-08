@@ -624,9 +624,9 @@ dependencies = [
 
 [[package]]
 name = "hidapi"
-version = "1.1.1"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "289d0fb85e9ea18785708d4d735eca4f480b533b005e6f8aa2ffba0207800c75"
+checksum = "1cfd6cd631a5f39abaabad541f0b64bfcb7e55fa5c7de9a1e5d5578cb86dd687"
 dependencies = [
  "cc",
  "libc",
@@ -1239,7 +1239,6 @@ dependencies = [
 [[package]]
 name = "probe-rs"
 version = "0.5.0"
-source = "git+https://github.com/probe-rs/probe-rs?branch=itm#bd0f9edcb64a7a5d8e8beb24ad1a0677a365bfb2"
 dependencies = [
  "bitfield",
  "capstone",
@@ -1266,7 +1265,6 @@ dependencies = [
 [[package]]
 name = "probe-rs-t2rust"
 version = "0.5.0"
-source = "git+https://github.com/probe-rs/probe-rs?branch=itm#bd0f9edcb64a7a5d8e8beb24ad1a0677a365bfb2"
 dependencies = [
  "base64",
  "proc-macro2 1.0.8",

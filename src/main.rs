@@ -62,8 +62,8 @@ fn main_try() -> Result<(), failure::Error> {
 
         session.trace_enable(&mut core)?;
         session.setup_tracing(&mut core)?;
-        session.start_trace_memory_address(&mut core, 0, 0x2000_3000)?;
-        session.start_trace_memory_address(&mut core, 1, 0x2000_3040)?;
+        session.enable_data_trace(&mut core, 0, 0x2000_3040)?;
+        session.enable_data_trace(&mut core, 1, 0x2000_3040)?;
     }
 
     println!("Starting ITM trace ...");

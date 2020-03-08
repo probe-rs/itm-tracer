@@ -14,9 +14,10 @@ export interface Update {
             id: number,
             payload: number[],
         },
-        DwtData: {
+        MemoryTrace: {
             id: number,
-            payload: number[],
+            access_type: 'Read' | 'Write',
+            value: number,
         },
     },
     Information: {
@@ -79,10 +80,12 @@ export class Connector {
         let id = '';
 
         if (data.Packet) {
+            console.log(data.Packet)
             if (data.Packet && data.Packet.ItmData) {
                 id = 'itm-' + data.Packet.ItmData.id;
-            } else if (data.Packet.DwtData) {
-                id = 'dwt-' + (data.Packet.DwtData.id >> 4);
+            } else if (data.Packet.MemoryTrace) {
+                console.log(data.Packet.MemoryTrace.id)
+                id = 'dwt-' + (data.Packet.MemoryTrace.id >> 4);
             }
 
             if (this.state.messageHandlers[id]) {
@@ -91,26 +94,6 @@ export class Connector {
                 });
             }
         }
-
-        // if(data.Packet && data.Packet.DwtData) {
-        //     if(data.Packet.DwtData.id == 17) {
-        //         let value = byteArrayToInt(data.Packet.DwtData.payload);
-        //         vnode.state.dwt_traces[0].push(value);
-        //         m.redraw();
-        //     } else {
-        //         console.log(data.Packet.DwtData.id);
-        //     }
-        //     console.log(data.Packet.DwtData)
-        // }
-        // if(data.Packet && data.Packet.ItmData) {
-        //     let incomming = "";
-        //     for(let i = 0; i < data.Packet.ItmData.payload.length; i++) {
-        //         let byte = data.Packet.ItmData.payload[i];
-        //         incomming += String.fromCharCode(byte);
-        //     }
-        //     vnode.state.log[data.Packet.ItmData.id] += incomming.replace("\n", "<br>");
-        //     m.redraw();
-        // }
     }
 
     onclose() {

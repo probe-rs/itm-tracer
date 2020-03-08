@@ -64,15 +64,6 @@ pub fn runner(session: &mut Session) -> ! {
                     time_delta /= 16_000_000.0;
                     timestamp += time_delta;
                 }
-                TracePacket::DwtData { id, payload } => {
-                    log::warn!("Dwt: id={} payload={:?}", id, payload);
-
-                    if id == 17 {
-                        let value: i32 = payload.pread(0).unwrap();
-                        log::error!("VAL={}", value);
-                        // client.send_sample("a", timestamp, value as f64).unwrap();
-                    }
-                }
                 TracePacket::ItmData { id, payload } => {
                     if let Some(stimuli) = console.as_mut() {
                         // First decode the string data from the stimuli.
