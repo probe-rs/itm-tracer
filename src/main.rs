@@ -61,7 +61,7 @@ fn main_try() -> Result<(), failure::Error> {
         session.trace_enable()?;
         session.setup_tracing()?;
         session.enable_data_trace(0, 0x2000_3040)?;
-        session.enable_data_trace(1, 0x2000_3040)?;
+        //session.enable_data_trace(1, 0x2000_3040)?;
     }
 
     println!("Starting ITM trace ...");
