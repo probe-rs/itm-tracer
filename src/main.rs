@@ -52,18 +52,16 @@ fn main_try() -> Result<(), failure::Error> {
     })?;
 
     // Use the first probe found.
-    let probe = Probe::from_probe_info(&device)?;
+    let probe = device.open()?;
 
     // Attach to a chip.
     let mut session = probe.attach(chip)?;
 
     {
-        let mut core = session.attach_to_core(CONFIG.core_index)?;
-
-        session.trace_enable(&mut core)?;
-        session.setup_tracing(&mut core)?;
-        session.enable_data_trace(&mut core, 0, 0x2000_3040)?;
-        session.enable_data_trace(&mut core, 1, 0x2000_3040)?;
+        session.trace_enable()?;
+        session.setup_tracing()?;
+        session.enable_data_trace(0, 0x2000_3040)?;
+        session.enable_data_trace(1, 0x2000_3040)?;
     }
 
     println!("Starting ITM trace ...");
