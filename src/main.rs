@@ -8,6 +8,7 @@ use std::path::Path;
 use colored::*;
 use failure::format_err;
 
+use probe_rs::architecture::arm::{SwoConfig, SwoMode};
 use probe_rs::config::TargetSelector;
 use probe_rs::Probe;
 
@@ -58,9 +59,13 @@ fn main_try() -> Result<(), failure::Error> {
     let mut session = probe.attach(chip)?;
 
     {
-        session.trace_enable()?;
-        session.setup_tracing()?;
-        session.enable_data_trace(0, 0x2000_3040)?;
+        let config = SwoConfig {
+            baud: 6000,
+            mode: SwoMode::UART,
+            tpiu_clk: 0,
+        };
+        session.setup_swv(&config)?;
+        session.add_swv_data_trace(0, 0x2000_3040)?;
         //session.enable_data_trace(1, 0x2000_3040)?;
     }
 

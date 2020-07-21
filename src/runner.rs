@@ -1,7 +1,7 @@
 use scroll::Pread;
 use serde::{Deserialize, Serialize};
 
-use probe_rs::itm::{Decoder, TracePacket};
+use probe_rs::architecture::arm::swo::{Decoder, TracePacket};
 use probe_rs::Session;
 
 use crate::config::CONFIG;
@@ -48,7 +48,7 @@ pub fn runner(session: &mut Session) -> ! {
             }
         }
 
-        let bytes = session.read_swv().unwrap();
+        let bytes = session.read_swo().unwrap();
 
         decoder.feed(bytes);
         while let Some(packet) = decoder.pull() {
