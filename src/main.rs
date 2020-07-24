@@ -60,9 +60,9 @@ fn main_try() -> Result<(), failure::Error> {
 
     {
         let config = SwoConfig {
-            baud: 8_000_000,
+            baud: 1_000_000,
             mode: SwoMode::UART,
-            tpiu_clk: 64_000_000,
+            tpiu_clk: 32_000_000,
         };
         session.setup_swv(&config)?;
         session.add_swv_data_trace(0, 0x2000_3040)?;
